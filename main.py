@@ -27,8 +27,16 @@ def list_blogs(db: Session = Depends(get_db)):
 
 # Get blog
 @app.get(path='/blogs/{pk}')
-def list_blogs(pk, db: Session = Depends(get_db), ):
+def get_blog(pk, db: Session = Depends(get_db), ):
     blog = db.query(blog_models.Blog).filter(blog_models.Blog.id == pk).first()
     if not blog:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Blog not found')
     return blog
+
+
+# Delete blog
+@app.delete(path='/blogs/{pk}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_blog(pk, db: Session = Depends(get_db)):
+    db.query(blog_models.Blog).filter(blog_models.Blog.id == pk).delete(synchronize_session=False)
+    db.commit()
+    return 'Deleted'
