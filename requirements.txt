@@ -1,4 +1,5 @@
 fastapi==0.70.0
+passlib[bcrypt]==1.7.4
 psycopg2-binary==2.9.2
 python-dotenv==0.19.2
 sqlalchemy==1.4.27
