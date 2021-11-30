@@ -1,7 +1,8 @@
 import uuid
 
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 
 from database import Base
 
@@ -12,6 +13,8 @@ class Blog(Base):
     title = Column(String,)
     body = Column(String,)
     published = Column(Boolean,)
+    user_id = Column(UUID, ForeignKey('user.id'))
+    owner = relationship('User', back_populates='blogs')
 
 
 class User(Base):
@@ -20,3 +23,4 @@ class User(Base):
     name = Column(String,)
     email = Column(String,)
     password = Column(String,)
+    blogs = relationship('Blog', back_populates='owner')
