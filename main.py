@@ -1,9 +1,8 @@
-from functools import lru_cache
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 
-from fastapi import FastAPI, HTTPException
 from blog import schemas as blog_schemas, models as blog_models
-from database import engine
-import config
+from database import engine, get_db
 
 blog_models.Base.metadata.create_all(bind=engine)
 
@@ -11,7 +10,10 @@ app = FastAPI()
 
 
 # Add blog entry
-@app.get(path='/create-blog')
-def create_blog(blog: blog_schemas.Blog):
-    print(blog, 'blog')
-    raise HTTPException(status_code=400, detail="X-Token header invalid")
+@app.post(path='/create-blog')
+def create_blog(request: blog_schemas.Blog, db: Session = Depends(get_db)):
+    new_blog = (blog_models.Blog(title=request.title, body=request.body, published=False))
+    db.add(new_blog)
+    db.commit()
+    db.refresh(new_blog)
+    return new_blog
