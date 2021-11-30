@@ -34,6 +34,17 @@ def get_blog(pk, db: Session = Depends(get_db), ):
     return blog
 
 
+# Update blog
+@app.put(path='/blogs/{pk}', status_code=status.HTTP_202_ACCEPTED)
+def update_blog(pk, request: blog_schemas.Blog, db: Session = Depends(get_db)):
+    blog = db.query(blog_models.Blog).filter(blog_models.Blog.id == pk)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Blog not found')
+    blog.update({'title': request.title, 'body': request.body, 'published': request.published})
+    db.commit()
+    return {'detail': 'Updated'}
+
+
 # Delete blog
 @app.delete(path='/blogs/{pk}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_blog(pk, db: Session = Depends(get_db)):
