@@ -15,12 +15,3 @@ class Blog(Base):
     published = Column(Boolean,)
     user_id = Column(UUID, ForeignKey('user.id'))
     owner = relationship('User', back_populates='blogs')
-
-
-class User(Base):
-    __tablename__ = 'user'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    name = Column(String,)
-    email = Column(String,)
-    password = Column(String,)
-    blogs = relationship('Blog', back_populates='owner')
