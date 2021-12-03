@@ -3,15 +3,22 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from . import schemas, models
+from user import schema as user_schema, auth, models as user_models
 
 router = APIRouter()
 
 
 # Add blog entry
 @router.post(path='/create-blog', status_code=status.HTTP_201_CREATED, tags=['blog'])
-def create_blog(request: schemas.Blog, db: Session = Depends(get_db)):
-    # todo -> Remove hard-coded blog user
-    new_blog = (models.Blog(title=request.title, body=request.body, published=False, user_id='996d2b36-c528-4569-b33a-2b9f45706cef'))
+def create_blog(
+        request: schemas.Blog,
+        db: Session = Depends(get_db),
+        current_user: user_schema.User = Depends(auth.get_current_user)
+):
+    user = db.query(user_models.User).filter(user_models.User.email == current_user.email).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect email or password')
+    new_blog = (models.Blog(title=request.title, body=request.body, published=False, user_id=str(user.id)))
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)

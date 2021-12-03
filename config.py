@@ -5,7 +5,10 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     app_name: str = "Awesome API"
-    database_dsn: str
+    DATABASE_DSN: str
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
     class Config:
         env_file = '.env'
